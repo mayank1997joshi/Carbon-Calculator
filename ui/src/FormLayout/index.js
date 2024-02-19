@@ -20,11 +20,14 @@ export default function FormLayout1() {
   
   const [errors, setErrors] = useState({});
 
+  const [apiResponse, setApiResponse] = useState({});
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setInputs({ ...inputs, [name]: value });
   
     if (name === 'email') {
+      console.log(name);
       validateEmail(value);
     } else if (name === 'phoneNumber') {
       validatePhoneNumber(value);
@@ -44,20 +47,24 @@ export default function FormLayout1() {
     if (Object.keys(validationErrors).length === 0) {
       const headers = { "Content-Type": "application/json" };
       const response = await axios.post('http://127.0.0.1:8080/v1/getemissioninfo', inputs, {headers,mode: "cors",});
-      console.log(response.data);
+      if (response?.data) {
+        setApiResponse(response?.data);
+      }
     }
   };
   
   const validateEmail = (email) => {
       const isEmailValid = email.toLowerCase().match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)
       if (!isEmailValid) {
-        errors['phoneNumber'] = 'Please enter a valid valid (a@b.com)'
+        errors['email'] = 'Please enter a valid valid (a@b.com)'
+        setErrors((prev) => ({ ...prev, ...errors}));
       }
   };
   
   const validatePhoneNumber = (phoneNumber) => {
     if (!Number.isNaN(phoneNumber) || phoneNumber.length > 10) {
       errors['phoneNumber'] = 'Please enter a 10-digit phone number'
+      setErrors((prev) => ({ ...prev, ...errors}));
     }
   };
   
@@ -214,6 +221,72 @@ export default function FormLayout1() {
             Calculate
           </Button>
       </RowContainer>
+      {Object.keys(apiResponse).length ?
+        apiResponse?.rating ?
+      <RowContainer className="items-center w-[100%] gap-[10px] md:items-center md:w-[100%] lg:items-center lg:w-[100%]"
+          gap="20px">
+          <ColumnContainer
+            className="items-start w-[100%] md:items-start md:w-[100%] lg:items-start lg:w-[100%]"
+            >
+            <ColumnContainer
+              className="items-start text-[15px] w-[100%] gap-y-[5px] md:items-start md:text-[15px] lg:items-start lg:text-[15px] lg:w-[100%]"
+             >
+              <Label
+                variant="profile-label"
+                for="email"
+                name="label"
+                htmlFor="email">
+                Result
+              </Label>
+              <Box
+                variant="profileicon-input"
+                className="w-[100%] md:w-[50%] lg:w-[100%]">
+                <Input
+                  variant="profileicon-input"
+                  className="w-[100%] text-[13px] md:w-[100%] lg:w-[100%]"
+                  placeholder="google.com"
+                  id="email"
+                  type="email"
+                  name="website"
+                  value={JSON.stringify(apiResponse)}
+                  disabled
+                  ></Input>
+              </Box>
+            </ColumnContainer>
+          </ColumnContainer>
+        </RowContainer>
+        :       <RowContainer className="items-center w-[100%] gap-[10px] md:items-center md:w-[100%] lg:items-center lg:w-[100%]"
+        gap="20px">
+        <ColumnContainer
+          className="items-start w-[100%] md:items-start md:w-[100%] lg:items-start lg:w-[100%]"
+          >
+          <ColumnContainer
+            className="items-start text-[15px] w-[100%] gap-y-[5px] md:items-start md:text-[15px] lg:items-start lg:text-[15px] lg:w-[100%]"
+           >
+            <Label
+              variant="profile-label"
+              for="email"
+              name="label"
+              htmlFor="email">
+              Result
+            </Label>
+            <Box
+              variant="profileicon-input"
+              className="w-[100%] md:w-[50%] lg:w-[100%]">
+              <Input
+                variant="profileicon-input"
+                className="w-[100%] text-[13px] md:w-[100%] lg:w-[100%]"
+                placeholder="google.com"
+                id="email"
+                type="email"
+                name="website"
+                disabled
+                value="Unable to fetch the carbon rating. Please try again"
+                ></Input>
+            </Box>
+          </ColumnContainer>
+        </ColumnContainer>
+      </RowContainer> : ''}
     </Box>
   );
 }
