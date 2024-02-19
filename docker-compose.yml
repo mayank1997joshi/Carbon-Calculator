@@ -1,0 +1,19 @@
+version: '1.0'
+
+services:
+  carbon_calculator_ui:
+    build: ./ui
+    image: carbon_calculator_ui
+    ports:
+      - 4000:80
+    container_name: carbon_calculator_ui
+    depends_on:
+      - carbon_calculator_server
+
+  carbon_calculator_server:
+    build: ./server
+    image: carbon_calculator_server
+    ports:
+      - 8080:8080
+    hostname: carbonserver
+    container_name: carbon_calculator_server
